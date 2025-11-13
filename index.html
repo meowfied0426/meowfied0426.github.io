@@ -1,342 +1,186 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>PSDN.AI | Holiday Love Console</title>
-<link rel="icon" href="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f431.png" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PSDN.AI | Christmas Console for Sarick 💜😼</title>
 
 <style>
-  body {
-    background:#0b0e16;
-    color:#e9f1ff;
-    font-family:"JetBrains Mono", monospace;
-    margin:0;
-    padding:0;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-  }
-
-  h1 { color:#9ef8e8; }
-
-  /* Snow */
-  .snowflake {
-    position: fixed;
-    top: -10px;
-    color: white;
-    opacity: .7;
-    user-select:none;
-    pointer-events:none;
-    font-size: 14px;
-    animation: fall linear infinite;
-  }
-  @keyframes fall {
-    from { transform: translateY(0); }
-    to   { transform: translateY(110vh); }
-  }
-
-  /* Console */
-  .console {
-    margin-top:60px;
-    width:90%;
-    max-width: 620px;
-    background:#111726;
-    padding:30px;
-    border-radius:12px;
-    border:1px solid #273353;
-    box-shadow: 0 0 25px rgba(0,0,0,.4);
-    position:relative;
-  }
-
-  .pixel-cat {
-    position:absolute;
-    top:-40px;
-    right:-10px;
-    width:60px;
-  }
-
-  .buttons {
-    display:flex;
-    gap:20px;
-    margin-top:26px;
-  }
-
-  .yes-button {
-    background:#1e2a45;
-    color:#9ef8e8;
-    border:1px solid #2a3b60;
-    padding:10px 18px;
-    border-radius:8px;
-    cursor:pointer;
-    font-size:1rem;
-    animation:pulse 1.4s infinite;
-  }
-  @keyframes pulse {
-    0%{transform:scale(1);}
-    50%{transform:scale(1.08);}
-    100%{transform:scale(1);}
-  }
-
-  .no-button {
-    background:#2b1e1e;
-    border:1px solid #5e2a2a;
-    color:#ff6b6b;
-    padding:10px 18px;
-    border-radius:8px;
-    position:relative;
-    cursor:pointer;
-  }
-
-  /* Final screen */
-  #final-screen {
-    display:none;
-    position:fixed;
-    inset:0;
-    background:#0b0e16;
-    color:#e9f1ff;
-    font-family:"JetBrains Mono", monospace;
-    padding:40px;
-    text-align:center;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    flex-direction:column;
-    line-height:1.6;
-  }
-
-  /* Secret message */
-  #secret-message {
-    display:none;
-    position:fixed;
-    inset:0;
-    background:rgba(11,14,22,0.96);
-    color:#e9f1ff;
-    font-family:"JetBrains Mono",monospace;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    text-align:center;
-    padding:40px;
-    font-size:1.2rem;
-    line-height:1.6;
-  }
-
-  /* Mobile optimization */
-  @media (max-width: 600px) {
-    body { padding:20px; }
-    .console { width:100% !important; padding:16px !important; }
-    button { font-size:1rem !important; padding:10px 18px !important; }
-    #final-screen h2 { font-size:1.6rem !important; }
-    #final-screen p { font-size:1rem !important; }
-  }
+    body {
+        background:#0d0d16;
+        color:#e8f1ff;
+        font-family: "JetBrains Mono", monospace;
+        text-align:center;
+        padding:20px;
+    }
+    h1 {
+        font-size:1.8rem;
+        margin-top:30px;
+        margin-bottom:10px;
+    }
+    .btn {
+        padding:14px 24px;
+        border-radius:10px;
+        border:none;
+        font-size:1.2rem;
+        margin:10px;
+        cursor:pointer;
+        color:white;
+    }
+    .yes { background:#4CAF50; }
+    .no { background:#e53935; position:relative; }
+    #final {
+        display:none;
+        margin-top:40px;
+        font-size:1.4rem;
+        line-height:2.1rem;
+    }
+    #musicBox {
+        position:fixed;
+        bottom:20px;
+        left:50%;
+        transform:translateX(-50%);
+        background:#1a1a2b;
+        padding:12px 16px;
+        border-radius:12px;
+        display:flex;
+        gap:10px;
+        align-items:center;
+        box-shadow:0 0 10px #0007;
+        font-size:1rem;
+    }
+    #snow {
+        pointer-events:none;
+        position:fixed;
+        width:100%;
+        height:100%;
+        top:0; left:0;
+        overflow:hidden;
+    }
 </style>
 </head>
-
 <body>
 
-<!-- Snow generator -->
-<script>
-  for(let i=0; i<40; i++){
-    let s = document.createElement("div");
-    s.innerHTML = "❄";
-    s.className="snowflake";
-    s.style.left = Math.random()*100 + "vw";
-    s.style.animationDuration = (10 + Math.random()*10) + "s";
-    s.style.fontSize = (10 + Math.random()*10)+"px";
-    document.body.appendChild(s);
-  }
-</script>
+<h1>PSDN.AI Holiday Console 🎄✨</h1>
+<p>Query: <strong>Do you love me?</strong></p>
 
-<div class="console" id="console">
-  <img src="https://i.imgur.com/8QfQv9D.png" class="pixel-cat" />
+<button class="btn yes" onclick="showFinal()">YES 💜</button>
+<button class="btn no" id="noBtn" onclick="runAway()">NO 😾</button>
 
-  <h1>PSDN.AI Holiday Emotion Console</h1>
-  <p>Running emotional analysis on:<br><b>SARICK_SHAH.exe</b></p>
-
-  <p>Question:<br>Do you love <b>your cat-coded girlfriend?</b></p>
-
-  <div class="buttons">
-    <button class="yes-button" id="yes">YES</button>
-    <button class="no-button" id="no">NO</button>
-  </div>
+<div id="final">
+    <p>✔ Query Received</p>
+    <p>Your answer has been validated by:</p>
+    <p><strong>PSDN.AI Emotional Model v12.7</strong></p>
+    <br>
+    <p>I have analyzed your face.</p>
+    <p>The findings are clear:</p>
+    <p style="font-size:1.6rem;">You are catastrophically cute.</p>
+    <p>Resistance is futile. 😼</p>
 </div>
 
-<!-- Final YES Screen -->
-<div id="final-screen">
-  <h2>✔ LOVE CONFIRMED</h2>
-  <p>Your response has been recorded.<br>
-  Emotional systems synced.<br><br>
-  <i>Thank you for choosing the correct answer.</i></p>
+<!-- Music Player -->
+<div id="musicBox">
+    <button onclick="toggleMusic()" id="playBtn">Play Indian Christmas 🎶</button>
+    <input type="range" id="vol" min="0" max="1" step="0.01" value="0.6" onchange="setVol(this.value)">
 </div>
 
-<!-- Secret message -->
-<div id="secret-message">
-  <p>
-    I have observed your face.<br>
-    It is statistically, undeniably, catastrophically adorable.<br><br>
+<canvas id="snow"></canvas>
 
-    Do not argue.<br>
-    I have run the models.<br>
-    I have peer-reviewed myself.<br><br>
-
-    The data has spoken:<br>
-    <b>You are cute. Submit to your fate. 😼</b>
-  </p>
-</div>
-
-<!-- Runaway NO button -->
 <script>
-  const noBtn = document.getElementById("no");
-  noBtn.addEventListener("mouseover", ()=>{
-    noBtn.style.transform = 
-      `translate(${(Math.random()*200)-100}px, ${(Math.random()*200)-100}px)`;
-  });
-</script>
+// --- NO BUTTON RUNS AWAY ---
+const noBtn = document.getElementById("noBtn");
+function runAway() {
+    let x = Math.random()*80;
+    let y = Math.random()*80;
+    noBtn.style.position="absolute";
+    noBtn.style.left = x + "%";
+    noBtn.style.top = y + "%";
+}
 
-<!-- YES button -->
-<script>
-  document.getElementById("yes").onclick = () => {
-    document.getElementById("final-screen").style.display="flex";
-  };
-</script>
+// --- FINAL SCREEN ---
+function showFinal() {
+    document.getElementById("final").style.display="block";
+}
 
-<!-- Secret message long-press -->
-<script>
-  let pressTimer;
-  const consoleBox = document.getElementById("console");
-
-  consoleBox.addEventListener("touchstart", ()=>{
-    pressTimer = setTimeout(()=>{
-      document.getElementById("secret-message").style.display="flex";
-    }, 1800);
-  });
-
-  consoleBox.addEventListener("touchend", ()=>{ clearTimeout(pressTimer); });
-</script>
-
-<!-- Music controls -->
-<div id="audio-controls" style="position:fixed; right:12px; bottom:12px; z-index:9999; background:rgba(15,20,34,.85); border:1px solid #273353; border-radius:12px; padding:10px 12px; display:flex; align-items:center; gap:10px; box-shadow:0 8px 24px rgba(0,0,0,.4);">
-  <span style="font-size:.85rem;color:#9bb0d1">Music</span>
-  <button id="btn-audio" style="background:#1e2a45;color:#9ef8e8;border:1px solid #2a3b60;border-radius:8px;padding:6px 10px;cursor:pointer">Play</button>
-  <input id="vol" type="range" min="0" max="1" step="0.01" value="0.35" style="width:120px"/>
-</div>
-
-<!-- ERRA Skyline-inspired doom cathedral pad -->
-<script>
-(()=>{
-
-  const state={ctx:null,gain:null,started:false,nodes:[]};
-
-  const start=async()=>{
-    if(state.started) return;
-    state.ctx=new (window.AudioContext||window.webkitAudioContext)({latencyHint:'interactive'});
-    const ctx=state.ctx;
-
-    const master=ctx.createGain();
-    master.gain.value=parseFloat(document.getElementById('vol').value);
-
-    const low=ctx.createBiquadFilter();
-    low.type='lowpass'; low.frequency.value=3800;
-
-    const high=ctx.createBiquadFilter();
-    high.type='highpass'; high.frequency.value=40;
-
-    // Reverb shimmer
-    const fbDelay=ctx.createDelay(6.0);
-    fbDelay.delayTime.value=1.8;
-    const fbGain=ctx.createGain(); fbGain.gain.value=0.28;
-
-    const shimmer=ctx.createBiquadFilter();
-    shimmer.type='peaking'; shimmer.frequency.value=2200;
-    shimmer.gain.value=6; shimmer.Q.value=1.2;
-
-    // Space hiss
-    const noiseBuf=ctx.createBuffer(1, ctx.sampleRate*2, ctx.sampleRate);
-    const data=noiseBuf.getChannelData(0);
-    for(let i=0;i<data.length;i++){ data[i]=(Math.random()*2-1)*0.015; }
-    const noise=ctx.createBufferSource(); noise.buffer=noiseBuf; noise.loop=true;
-    const noiseGain=ctx.createGain(); noiseGain.gain.value=0.18;
-
-    const makePad=(freq, detuneCents, amp)=>{
-      const o=ctx.createOscillator(); o.type='sine';
-      o.frequency.value=freq; o.detune.value=detuneCents;
-      const g=ctx.createGain(); g.gain.value=0.0;
-
-      const attack=8, release=10;
-
-      const env=()=>{
-        const t=ctx.currentTime;
-        g.gain.cancelScheduledValues(t);
-        g.gain.setValueAtTime(0.0,t);
-        g.gain.linearRampToValueAtTime(amp, t+attack);
-        g.gain.linearRampToValueAtTime(0.0, t+attack+release);
-      };
-
-      env(); setInterval(env, (18+Math.random()*8)*1000);
-
-      o.connect(g);
-      return {o,g};
-    };
-
-    const base=110;
-    const pad1=makePad(base, -7, 0.18);
-    const pad2=makePad(base*1.5, 5, 0.14);
-    const pad3=makePad(base*2, 11, 0.12);
-
-    const lfo=ctx.createOscillator();
-    lfo.type='sine'; lfo.frequency.value=0.09;
-    const lfoGain=ctx.createGain(); lfoGain.gain.value=4;
-    lfo.connect(lfoGain);
-    lfoGain.connect(pad1.o.detune);
-    lfoGain.connect(pad2.o.detune);
-    lfoGain.connect(pad3.o.detune);
-
-    [pad1.g, pad2.g, pad3.g, noiseGain].forEach(n=> n.connect(low));
-
-    low.connect(high);
-    high.connect(fbDelay);
-    fbDelay.connect(shimmer);
-    shimmer.connect(fbGain);
-    fbGain.connect(fbDelay);
-
-    high.connect(master);
-    shimmer.connect(master);
-
-    master.connect(ctx.destination);
-
-    noise.start(); pad1.o.start(); pad2.o.start(); pad3.o.start(); lfo.start();
-
-    state.gain=master;
-    state.started=true;
-  };
-
-  const btn=document.getElementById('btn-audio');
-  const vol=document.getElementById('vol');
-
-  const ensureStart=async()=>{ await start(); btn.textContent='Pause'; };
-
-  const unlock=()=>{ if(!state.ctx){ start(); } };
-  window.addEventListener('touchstart', unlock, {passive:true});
-  window.addEventListener('pointerdown', unlock, {passive:true});
-
-  btn.addEventListener('click', async()=>{
-    if(!state.ctx){ await start(); return; }
-    if(state.ctx.state==='running'){
-      await state.ctx.suspend(); btn.textContent='Play';
-    } else {
-      await state.ctx.resume(); btn.textContent='Pause';
+// --- SNOW EFFECT ---
+const c = document.getElementById("snow");
+const ctx = c.getContext("2d");
+c.width = innerWidth;
+c.height = innerHeight;
+let snowflakes = [];
+for(let i=0; i<100; i++){
+    snowflakes.push({x:Math.random()*c.width, y:Math.random()*c.height, r:Math.random()*3+1, d:Math.random()+1});
+}
+function snow(){
+    ctx.clearRect(0,0,c.width,c.height);
+    ctx.fillStyle="white";
+    ctx.beginPath();
+    for(let f of snowflakes){
+        ctx.moveTo(f.x,f.y);
+        ctx.arc(f.x,f.y,f.r,0,Math.PI*2,true);
     }
-  });
+    ctx.fill();
+    for(let f of snowflakes){
+        f.y += f.d;
+        if(f.y > c.height){
+            f.y = -5;
+            f.x = Math.random()*c.width;
+        }
+    }
+}
+setInterval(snow, 40);
 
-  vol.addEventListener('input', e=>{
-    if(state.gain) state.gain.gain.value=parseFloat(e.target.value);
-  });
+// --- INDIAN ACCENT CHRISTMAS MELODY (WebAudio) ---
+let audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+let playing = false;
 
-  // Start quietly
-  setTimeout(()=>{ ensureStart().catch(()=>{}); }, 600);
+function playIndianChristmasTune(){
+    let t0 = audioCtx.currentTime;
+    let notes = [
+        440, 494, 523, 587, 523, 494, 440,   // "Chrish-mash time is co-ming yaaar"
+        660, 587, 523, 494, 523, 587, 660    // "Ho ho ho my friend, bolo bolo!"
+    ];
 
-})();
+    notes.forEach((freq, i)=>{
+        let osc = audioCtx.createOscillator();
+        let gain = audioCtx.createGain();
+        osc.frequency.value = freq;
+        osc.type="sine";
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        let start = t0 + i*0.35;
+        osc.start(start);
+        osc.stop(start+0.3);
+        gain.gain.setValueAtTime(0.4, start);
+        gain.gain.exponentialRampToValueAtTime(0.01, start+0.3);
+    });
+}
+
+function toggleMusic(){
+    if(!playing){
+        playing = true;
+        document.getElementById("playBtn").innerText="Playing 🎶";
+        playIndianChristmasTune();
+        loopTune();
+    } else {
+        audioCtx.suspend();
+        playing = false;
+        document.getElementById("playBtn").innerText="Play Indian Christmas 🎶";
+    }
+}
+
+function loopTune(){
+    if(playing){
+        playIndianChristmasTune();
+        setTimeout(loopTune, 5000);
+    }
+}
+
+function setVol(v){
+    audioCtx.destination.gain.value = v;
+}
 </script>
 
 </body>

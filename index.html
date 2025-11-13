@@ -1,606 +1,196 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>PSDN.AI | Holiday Metrics Console</title>
-  <style>
-    :root {
-      --bg: #050816;
-      --bg2: #0b1024;
-      --card: #101729;
-      --border: #283553;
-      --text: #e5f0ff;
-      --muted: #9caecd;
-      --accent: #73ffd7;
-      --accent2: #ffd36b;
-      --danger: #ff6b81;
-      --pixel: #111827;
-    }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>PSDN.AI | Holiday Neural Console</title>
 
-    * {
-      box-sizing: border-box;
-    }
+<style>
+  body {
+    margin: 0;
+    font-family: "JetBrains Mono", monospace;
+    background: #060b12;
+    color: #d9e7ff;
+    overflow-x: hidden;
+  }
 
-    body {
-      margin: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-        Roboto, "Apple Color Emoji", "Segoe UI Emoji";
-      background: radial-gradient(circle at top, #1a2650 0, var(--bg) 55%);
-      color: var(--text);
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
+  /* Loading Screen */
+  #loading-screen {
+    position: fixed;
+    inset: 0;
+    background: #000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+  }
+  #loading-screen img {
+    width: 160px;
+    opacity: 0.9;
+  }
+  #loading-text {
+    margin-top: 16px;
+    font-size: 1rem;
+    color: #9bb0d1;
+    letter-spacing: 2px;
+  }
 
-    /* Splash screen */
-    #splash {
-      position: fixed;
-      inset: 0;
-      background: radial-gradient(circle at top, #1a2650 0, var(--bg) 55%);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      z-index: 20;
-      text-align: center;
-      padding: 24px;
-    }
-    #splash-logo {
-      width: 140px;
-      height: 140px;
-      border-radius: 24px;
-      overflow: hidden;
-      border: 2px solid var(--accent);
-      box-shadow: 0 0 28px rgba(115, 255, 215, 0.4);
-      margin-bottom: 18px;
-    }
-    #splash-logo img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-    #splash h1 {
-      margin: 0 0 8px;
-      font-size: 1.4rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-    }
-    #splash p {
-      margin: 0 0 18px;
-      color: var(--muted);
-      font-size: 0.95rem;
-    }
-    .progress-shell {
-      width: 230px;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      padding: 3px;
-      overflow: hidden;
-    }
-    .progress-bar {
-      height: 10px;
-      border-radius: 999px;
-      background: linear-gradient(90deg, var(--accent), var(--accent2));
-      width: 0%;
-      animation: load 2.4s ease-out forwards;
-    }
-    @keyframes load {
-      from { width: 0%; }
-      to { width: 100%; }
-    }
+  /* Fade-out animation */
+  .fade-out {
+    animation: fadeOut 1.3s forwards;
+  }
+  @keyframes fadeOut {
+    to { opacity: 0; visibility: hidden; }
+  }
 
-    /* Main dashboard layout */
-    #dashboard {
-      max-width: 960px;
-      margin: 40px auto 80px;
-      padding: 0 16px 40px;
-      display: none; /* shown after splash */
-      position: relative;
-    }
+  /* Main container */
+  #main {
+    padding: 24px;
+    display: none;
+  }
 
-    header {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      margin-bottom: 24px;
-    }
-    .logo-small {
-      width: 40px;
-      height: 40px;
-      border-radius: 12px;
-      overflow: hidden;
-      border: 1px solid var(--accent);
-      flex-shrink: 0;
-    }
-    .logo-small img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-    .title-wrap h1 {
-      margin: 0;
-      font-size: 1.4rem;
-    }
-    .title-wrap span {
-      display: block;
-      color: var(--muted);
-      font-size: 0.85rem;
-    }
+  h1 {
+    font-size: 1.6rem;
+    color: #9ef8e8;
+  }
 
-    .grid {
-      display: grid;
-      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.1fr);
-      gap: 16px;
-    }
-    @media (max-width: 720px) {
-      .grid {
-        grid-template-columns: minmax(0, 1fr);
-      }
-      #dashboard {
-        margin-top: 24px;
-      }
-    }
+  .panel {
+    background: rgba(18, 28, 48, 0.55);
+    border: 1px solid #283953;
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 20px;
+    backdrop-filter: blur(4px);
+  }
 
-    .card {
-      background: radial-gradient(circle at top left, #1b2747 0, var(--card) 55%);
-      border-radius: 18px;
-      border: 1px solid var(--border);
-      padding: 14px 16px 16px;
-      box-shadow: 0 14px 30px rgba(0, 0, 0, 0.45);
-    }
-    .card h2 {
-      margin: 0 0 6px;
-      font-size: 1rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
-    .card small {
-      color: var(--muted);
-      font-size: 0.8rem;
-    }
+  .image-row {
+    display: flex;
+    gap: 16px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+  }
 
-    .profile-img,
-    .memory-img {
-      margin-top: 10px;
-      border-radius: 16px;
-      overflow: hidden;
-      border: 1px solid #36456a;
-    }
-    .profile-img img,
-    .memory-img img {
-      width: 100%;
-      height: auto;
-      display: block;
-    }
+  .image-row img {
+    border-radius: 12px;
+    border: 1px solid #324766;
+    width: 300px;
+  }
 
-    .meta-row {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 8px;
-      font-size: 0.8rem;
-      color: var(--muted);
-    }
+  /* Buttons */
+  .btn {
+    margin-top: 20px;
+    background: #1e2a45;
+    border: 1px solid #324766;
+    color: #9ef8e8;
+    border-radius: 10px;
+    padding: 10px 16px;
+    cursor: pointer;
+    font-size: 1rem;
+  }
 
-    /* Pixel heart meter */
-    .heart-meter {
-      margin-top: 10px;
-      display: flex;
-      gap: 6px;
-    }
-    .heart-pixel {
-      width: 28px;
-      height: 28px;
-      background: var(--pixel);
-      border: 2px solid #374151;
-      position: relative;
-      box-shadow: 0 0 0 2px #030712;
-      overflow: hidden;
-    }
-    .heart-pixel::before {
-      content: "♥";
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #f9fafb;
-      font-size: 0.85rem;
-      opacity: 0.15;
-    }
-    .heart-fill {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, #fb7185, #f97316);
-      clip-path: polygon(50% 0%, 61% 7%, 71% 18%, 78% 29%, 82% 42%, 81% 55%, 76% 66%, 68% 77%, 57% 88%, 50% 94%, 43% 88%, 32% 77%, 24% 66%, 19% 55%, 18% 42%, 22% 29%, 29% 18%, 39% 7%);
-      transform-origin: center bottom;
-      transform: scale(0);
-      animation: fillHeart 1.6s forwards;
-    }
-    .heart-pixel:nth-child(2) .heart-fill { animation-delay: 0.18s; }
-    .heart-pixel:nth-child(3) .heart-fill { animation-delay: 0.36s; }
-    .heart-pixel:nth-child(4) .heart-fill { animation-delay: 0.54s; }
-    .heart-pixel:nth-child(5) .heart-fill { animation-delay: 0.72s; }
+  /* Secret screen */
+  #secret-screen {
+    position: fixed;
+    inset: 0;
+    background: #060b12;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px;
+    text-align: center;
+    z-index: 9998;
+  }
 
-    @keyframes fillHeart {
-      from { transform: scale(0); }
-      60% { transform: scale(1.08); }
-      to { transform: scale(1); }
-    }
-
-    .metric-row {
-      margin-top: 10px;
-      font-size: 0.85rem;
-      color: var(--muted);
-      display: flex;
-      justify-content: space-between;
-    }
-
-    /* Buttons */
-    .btn-row {
-      margin-top: 14px;
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-    button {
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      padding: 9px 16px;
-      font-size: 0.9rem;
-      cursor: pointer;
-      background: #111827;
-      color: var(--text);
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-    button span.dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 999px;
-      background: var(--accent);
-    }
-    button.primary {
-      background: linear-gradient(135deg, var(--accent), #6ee7ff);
-      color: #020617;
-      border-color: transparent;
-      font-weight: 600;
-      box-shadow: 0 10px 24px rgba(110, 231, 255, 0.4);
-    }
-    button.danger {
-      border-color: var(--danger);
-      color: var(--danger);
-      position: relative;
-    }
-
-    /* NO button runaway area */
-    .decision-area {
-      position: relative;
-      min-height: 70px;
-    }
-    #btn-no {
-      position: absolute;
-      bottom: 0;
-      right: 0;
-      transition: transform 0.15s ease-out;
-    }
-
-    /* Cat animation */
-    .cat-orbit {
-      position: fixed;
-      bottom: 16px;
-      left: 14px;
-      font-size: 1.5rem;
-      pointer-events: none;
-      z-index: 5;
-      animation: floatCat 3.8s ease-in-out infinite;
-    }
-    @keyframes floatCat {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-10px) scale(1.02); }
-    }
-    .cat-orbit small {
-      display: block;
-      font-size: 0.65rem;
-      color: var(--muted);
-    }
-
-    /* Secret screen */
-    #secret-screen {
-      position: fixed;
-      inset: 0;
-      background: radial-gradient(circle at top, #182852 0, #050816 60%);
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      padding: 40px 16px 32px;
-      text-align: center;
-      overflow-y: auto;
-      z-index: 15;
-    }
-    #secret-screen h1 {
-      margin-top: 10px;
-      margin-bottom: 6px;
-      font-size: 1.6rem;
-    }
-    #secret-screen p {
-      margin: 0 0 20px;
-      max-width: 520px;
-      color: var(--muted);
-      font-size: 0.98rem;
-    }
-    .secret-img {
-      max-width: 520px;
-      width: 100%;
-      border-radius: 20px;
-      overflow: hidden;
-      border: 1px solid #374151;
-      margin-bottom: 22px;
-      box-shadow: 0 18px 36px rgba(0,0,0,0.6);
-    }
-    .secret-img img {
-      width: 100%;
-      height: auto;
-      display: block;
-    }
-
-    /* Audio controls */
-    #audio-controls {
-      margin-top: 10px;
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      padding: 8px 12px;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      background: rgba(2, 6, 23, 0.8);
-      font-size: 0.85rem;
-    }
-    #audio-controls button {
-      padding: 6px 12px;
-      font-size: 0.8rem;
-      box-shadow: none;
-    }
-    #audio-controls span {
-      color: var(--muted);
-    }
-
-    /* Mobile tweaks */
-    @media (max-width: 600px) {
-      header {
-        flex-direction: row;
-        align-items: center;
-      }
-      .title-wrap h1 {
-        font-size: 1.1rem;
-      }
-      .card {
-        padding: 12px;
-      }
-      #secret-screen {
-        padding-top: 32px;
-      }
-    }
-  </style>
+  #secret-screen img {
+    width: 260px;
+    border-radius: 14px;
+    border: 1px solid #324766;
+    margin-top: 20px;
+  }
+</style>
 </head>
+
 <body>
-  <!-- Splash -->
-  <div id="splash">
-    <div id="splash-logo">
-      <img src="poseidon-og.jpg" alt="PSDN.AI logo" />
-    </div>
-    <h1>PSDN.AI SYSTEM BOOT</h1>
-    <p>Initializing holiday metrics, calibrating cat module, verifying one (1) human named <strong>Sarick Shah</strong>…</p>
-    <div class="progress-shell">
-      <div class="progress-bar"></div>
+
+<!-- Loading Screen -->
+<div id="loading-screen">
+  <img src="poseidon-og.jpg" alt="PSDN Logo">
+  <div id="loading-text">INITIALIZING SYSTEMS...</div>
+</div>
+
+<!-- Main Page -->
+<div id="main">
+  <h1>PSDN.AI // HOLIDAY NEURAL DASHBOARD (2025)</h1>
+
+  <div class="panel">
+    <h2>SUBJECT: SARICK SHAH — CUTENESS ANALYTICS</h2>
+    <p>All statistical models indicate abnormally high levels of charm, intelligence, and unintended adorableness.</p>
+    <div class="image-row">
+      <img src="poseidon-og.jpg" alt="PSDN">
+      <img src="Sarick.jpg" alt="Sarick">
     </div>
   </div>
 
-  <!-- Cat animation -->
-  <div class="cat-orbit">
-    🐈‍⬛
-    <small>observer: cat module online</small>
+  <div class="panel">
+    <h2>@Seoul, September, 2025💜</h2>
+    <p>Memory Pattern Capture Verified · Emotional Weight: HIGH · Confidence: 99.7%</p>
+    <div class="image-row">
+      <img src="September.jpg" alt="September Memory">
+    </div>
   </div>
 
-  <!-- Main dashboard -->
-  <main id="dashboard">
-    <header>
-      <div class="logo-small">
-        <img src="poseidon-og.jpg" alt="PSDN.AI logo small" />
-      </div>
-      <div class="title-wrap">
-        <h1>PSDN.AI • Cat-Powered Holiday Metrics</h1>
-        <span>internal console · experiment id: HOLIDAY-2024-SARICK</span>
-      </div>
-    </header>
+  <div class="panel">
+    <h2>EMOTIONAL RESPONSE QUERY</h2>
+    <p>Do you love the administrator of this console?</p>
+    <button class="btn" onclick="showSecret()">YES</button>
+    <button class="btn" style="position:relative;" onmouseover="runAway(this)">NO</button>
+  </div>
 
-    <section class="grid">
-      <!-- LEFT COLUMN -->
-      <div class="left">
-        <article class="card">
-          <h2>Subject Profile</h2>
-          <small>entity: <strong>Sarick Shah</strong> · status: under affectionate observation</small>
-          <div class="profile-img">
-            <img src="Sarick.jpg" alt="Sarick photo" />
-          </div>
-          <div class="meta-row">
-            <span>domain: PSDN.AI</span>
-            <span>signal: high-nerd density</span>
-          </div>
-        </article>
+  <div class="panel">
+    <h2>AUDIO MODULE</h2>
+    <p>Tap to hear special holiday transmission.</p>
+    <button class="btn" onclick="playAudio()">Play My Message</button>
+    <audio id="myaudio" src="merry.mp3"></audio>
+  </div>
+</div>
 
-        <article class="card" style="margin-top: 14px;">
-          <h2>Sample Memory Capture</h2>
-          <small>snippet: timestamped moment with stable high-vibes</small>
-          <div class="memory-img">
-            <img src="September.jpg" alt="Captured moment" />
-          </div>
-          <div class="meta-row">
-            <span>emotion index: ★★★★★</span>
-            <span>revisit probability: 99.7%</span>
-          </div>
-        </article>
-      </div>
+<!-- Secret Page -->
+<div id="secret-screen">
+  <h1>ACCESS GRANTED</h1>
+  <p>CLASSIFIED DATA UNLOCKED: SUBJECT'S BABY FORM & CORE MEMORY</p>
+  <img src="baby-sarick.jpg" alt="Baby Sarick">
+</div>
 
-      <!-- RIGHT COLUMN -->
-      <div class="right">
-        <article class="card">
-          <h2>Affection Telemetry</h2>
-          <small>real-time reading from cat-core processor</small>
-
-          <div class="heart-meter">
-            <div class="heart-pixel"><div class="heart-fill"></div></div>
-            <div class="heart-pixel"><div class="heart-fill"></div></div>
-            <div class="heart-pixel"><div class="heart-fill"></div></div>
-            <div class="heart-pixel"><div class="heart-fill"></div></div>
-            <div class="heart-pixel"><div class="heart-fill"></div></div>
-          </div>
-
-          <div class="metric-row">
-            <span>cuteness score: <strong>99.999%</strong></span>
-            <span>statistical doubt: <strong>0.001%</strong></span>
-          </div>
-          <div class="metric-row">
-            <span>cat-approval: <strong>granted</strong></span>
-            <span>override attempts: blocked</span>
-          </div>
-        </article>
-
-        <article class="card" style="margin-top: 14px;">
-          <h2>Decision Protocol</h2>
-          <small>question: does subject acknowledge being loved?</small>
-          <pre style="margin-top:8px; background:#020617; padding:8px 10px; border-radius:10px; border:1px solid #1f2937; font-size:0.75rem; color:#9caecd; overflow-x:auto;">
-{
-  "subject": "Sarick",
-  "module": "cat_affection_v1",
-  "love_probability": 0.999999,
-  "allowed_responses": ["yes"]
-}
-          </pre>
-
-          <div class="decision-area">
-            <div class="btn-row">
-              <button id="btn-yes" class="primary">
-                <span class="dot"></span>
-                Yes, I accept this data
-              </button>
-
-              <button id="btn-no" class="danger">
-                ❌ No, reject findings
-              </button>
-            </div>
-          </div>
-        </article>
-
-        <article class="card" style="margin-top: 14px;">
-          <h2>Audio Channel</h2>
-          <small>holiday voice packet from control center</small>
-          <div id="audio-controls">
-            <span>greeting: ready</span>
-            <button id="btn-audio">Play greeting</button>
-          </div>
-          <audio id="bg-audio" src="merry.mp3" preload="auto"></audio>
-        </article>
-      </div>
-    </section>
-  </main>
-
-  <!-- Secret screen -->
-  <section id="secret-screen">
-    <h1>ACCESS GRANTED ✔</h1>
-    <p>
-      You chose correctly. Universe approves your decision.<br />
-      Further analysis is unnecessary: you are already the optimal answer.
-    </p>
-
-    <div class="secret-img">
-      <img src="baby-sarick.jpg" alt="Baby Sarick" />
-    </div>
-
-    <p style="margin-bottom: 10px;">
-      Independent review of historical data confirms: cuteness is a permanent condition.
-    </p>
-
-    <div id="audio-controls">
-      <span>play again?</span>
-      <button id="btn-audio-secret">Play greeting</button>
-    </div>
-  </section>
-
-  <script>
-    // Show dashboard after splash
-    window.addEventListener("DOMContentLoaded", function () {
-      const splash = document.getElementById("splash");
-      const dashboard = document.getElementById("dashboard");
+<script>
+  /* Loading fade effect */
+  window.onload = function() {
+    setTimeout(() => {
+      document.getElementById("loading-screen").classList.add("fade-out");
       setTimeout(() => {
-        splash.style.display = "none";
-        dashboard.style.display = "block";
-        window.scrollTo(0, 0);
-      }, 2500);
-    });
+        document.getElementById("loading-screen").style.display = "none";
+        document.getElementById("main").style.display = "block";
+      }, 1300);
+    }, 1200);
+  };
 
-    // Runaway NO button
-    const btnNo = document.getElementById("btn-no");
-    const decisionArea = document.querySelector(".decision-area");
-    if (btnNo && decisionArea) {
-      btnNo.addEventListener("mouseenter", () => {
-        const areaRect = decisionArea.getBoundingClientRect();
-        const maxX = areaRect.width - 120;
-        const maxY = areaRect.height - 40;
-        const x = Math.random() * maxX;
-        const y = Math.random() * maxY;
-        btnNo.style.transform = `translate(${-x}px, ${-y}px)`;
-      });
-      btnNo.addEventListener("click", (e) => {
-        e.preventDefault();
-        alert("Error 409: denial not permitted by cat module.");
-      });
-    }
+  /* Secret page */
+  function showSecret() {
+    document.getElementById("secret-screen").style.display = "flex";
+  }
 
-    // Yes button -> secret screen
-    const btnYes = document.getElementById("btn-yes");
-    const secret = document.getElementById("secret-screen");
-    const dashboard = document.getElementById("dashboard");
+  /* Runaway NO button */
+  function runAway(btn) {
+    const x = Math.random() * 200 - 100;
+    const y = Math.random() * 200 - 100;
+    btn.style.transform = `translate(${x}px, ${y}px)`;
+  }
 
-    if (btnYes && secret && dashboard) {
-      btnYes.addEventListener("click", () => {
-        dashboard.style.display = "none";
-        secret.style.display = "flex";
-        window.scrollTo(0, 0);
-      });
-    }
+  /* Audio */
+  function playAudio() {
+    document.getElementById("myaudio").play();
+  }
+</script>
 
-    // Audio controls (same audio on both screens)
-    const audio = document.getElementById("bg-audio");
-    const btnAudio = document.getElementById("btn-audio");
-    const btnAudioSecret = document.getElementById("btn-audio-secret");
-
-    function toggleAudio(btn) {
-      if (!audio) return;
-      if (audio.paused) {
-        audio
-          .play()
-          .then(() => {
-            if (btn) btn.textContent = "Pause greeting";
-          })
-          .catch(() => {
-            alert("Tap again to allow audio to play on this device.");
-          });
-      } else {
-        audio.pause();
-        if (btn) btn.textContent = "Play greeting";
-      }
-    }
-
-    if (btnAudio) {
-      btnAudio.addEventListener("click", () => toggleAudio(btnAudio));
-    }
-    if (btnAudioSecret) {
-      btnAudioSecret.addEventListener("click", () =>
-        toggleAudio(btnAudioSecret)
-      );
-    }
-  </script>
 </body>
 </html>

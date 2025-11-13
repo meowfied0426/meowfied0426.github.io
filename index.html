@@ -1,186 +1,779 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>PSDN.AI – Cat Powered Christmas Console</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PSDN.AI | Holiday Love Console</title>
+  <style>
+    :root {
+      --bg: #050814;
+      --bg2: #0b1024;
+      --panel: #101628;
+      --border: #273353;
+      --text: #e8f1ff;
+      --muted: #9bb0d1;
+      --accent: #8ef8e8;
+      --accent2: #ffcf6b;
+      --error: #ff6b81;
+      --good: #4be4a5;
+      --pixel-off: #1b2236;
+      --pixel-on: #ff4d8a;
+    }
 
-<style>
-body {
-    margin: 0;
-    background: radial-gradient(circle at center, #0b0e16 0%, #000000 100%);
-    color: #e9f1ff;
-    font-family: "JetBrains Mono", monospace;
-    text-align: center;
-    overflow-x: hidden;
-}
+    * { box-sizing: border-box; }
 
-/* Floating stars */
-@keyframes stars {
-    from {transform: translateY(0);}
-    to {transform: translateY(-2000px);}
-}
-.stars {
-    width: 2px;
-    height: 2px;
-    background: white;
-    position: absolute;
-    top: 100vh;
-    left: calc(5vw + 90vw * var(--i));
-    animation: stars 12s linear infinite;
-    opacity: 0.8;
-}
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 10% 0%, #1b2a4f 0, transparent 55%),
+        radial-gradient(circle at 90% 0%, #3b2064 0, transparent 60%),
+        radial-gradient(circle at 50% 100%, #0a1a36 0, #050814 60%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      overflow: hidden;
+    }
 
-/* Cat animation */
-.cat {
-    font-size: 44px;
-    animation: floatCat 3s ease-in-out infinite;
-    margin-top: 20px;
-}
-@keyframes floatCat {
-    0% {transform: translateY(0);}
-    50% {transform: translateY(-12px);}
-    100% {transform: translateY(0);}
-}
+    /* main console */
 
-/* PSDN Logo Style */
-.logo {
-    margin-top: 35px;
-    font-size: 25px;
-    letter-spacing: 2px;
-    font-weight: bold;
-    color: #53e3fb;
-}
+    .console {
+      position: relative;
+      width: 100%;
+      max-width: 960px;
+      background: radial-gradient(circle at top left, #18233f, #0d1324 60%);
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.7);
+      padding: 20px 22px 24px;
+      overflow: hidden;
+    }
 
-/* Question Card */
-.card {
-    margin: 50px auto;
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.1);
-    padding: 20px;
-    width: 85%;
-    border-radius: 12px;
-}
+    .scan-lines {
+      pointer-events: none;
+      position: absolute;
+      inset: 0;
+      background-image: repeating-linear-gradient(
+        to bottom,
+        rgba(255,255,255,0.06),
+        rgba(255,255,255,0.06) 1px,
+        transparent 1px,
+        transparent 3px
+      );
+      mix-blend-mode: soft-light;
+      opacity: 0.2;
+      animation: scan 6s linear infinite;
+    }
 
-/* Buttons */
-button {
-    background: #10141f;
-    color: #e9f1ff;
-    border: 1px solid #4a5568;
-    padding: 12px 25px;
-    border-radius: 12px;
-    margin: 10px;
-    font-size: 18px;
-}
-button:hover {
-    background: #1d2433;
-}
+    @keyframes scan {
+      0% { transform: translateY(-10%); }
+      100% { transform: translateY(10%); }
+    }
 
-/* NO button running away */
-#noBtn {
-    position: relative;
-}
+    .header-row {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 16px;
+      z-index: 2;
+    }
 
-/* Heart meter */
-.heart-bar {
-    margin-top: 20px;
-}
-.pixel-heart {
-    font-size: 22px;
-    margin: 2px;
-}
+    .logo-wrap {
+      width: 64px;
+      height: 64px;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: #050814;
+      flex-shrink: 0;
+    }
 
-/* Secret page hidden initially */
-#secretPage {
-    display: none;
-    margin-top: 60px;
-}
-.secret-text {
-    font-size: 20px;
-    line-height: 1.7;
-    padding: 20px;
-}
+    .logo-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
 
-/* Baby photo */
-.baby {
-    margin-top: 20px;
-    width: 70%;
-    border-radius: 12px;
-}
-</style>
+    .title-block {
+      flex: 1;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(142,248,232,0.4);
+      color: var(--muted);
+      font-size: 12px;
+      background: rgba(5,8,20,0.8);
+      backdrop-filter: blur(4px);
+    }
+
+    .badge-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--good);
+      box-shadow: 0 0 8px var(--good);
+    }
+
+    h1 {
+      margin: 6px 0 4px;
+      font-size: clamp(20px, 4vw, 28px);
+      letter-spacing: 0.04em;
+    }
+
+    h1 span {
+      background: linear-gradient(90deg, var(--accent), #81c7ff, var(--accent2));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .subtitle {
+      margin: 0;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    /* layout two columns */
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 2.2fr) minmax(0, 1.8fr);
+      gap: 16px;
+      margin-top: 18px;
+      z-index: 2;
+      position: relative;
+    }
+
+    .panel {
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: radial-gradient(circle at top left, #1b2237, #0c111f 55%);
+      padding: 14px 14px 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .panel-title {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .status-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    .status-pill {
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 255, 214, 0.5);
+      color: #a7ffdf;
+      font-size: 11px;
+      background: rgba(15, 30, 33, 0.8);
+    }
+
+    .profile-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .avatar {
+      width: 64px;
+      height: 64px;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.18);
+      background: #050814;
+      flex-shrink: 0;
+    }
+
+    .avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .profile-text {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .profile-text strong {
+      display: block;
+      font-size: 14px;
+      color: var(--text);
+    }
+
+    /* pixel heart meter */
+
+    .meter-wrap {
+      margin-top: 10px;
+    }
+
+    .meter-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .pixel-meter {
+      display: flex;
+      gap: 4px;
+    }
+
+    .pixel-cell {
+      width: 14px;
+      height: 14px;
+      background: var(--pixel-off);
+      border-radius: 3px;
+      box-shadow: 0 0 0 1px #050814;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .pixel-cell.on {
+      background: var(--pixel-on);
+      box-shadow: 0 0 10px rgba(255, 77, 138, 0.8);
+    }
+
+    .pixel-cell.on::after {
+      content: "❤";
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      color: #ffeef7;
+    }
+
+    .pixel-meter .pixel-cell:nth-child(odd).on {
+      animation: pulseHeart 1.4s infinite;
+    }
+
+    @keyframes pulseHeart {
+      0% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.15); opacity: 0.85; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    /* cat animation */
+
+    .cat-orbit {
+      position: absolute;
+      right: 10px;
+      top: 12px;
+      font-size: 22px;
+      opacity: 0.9;
+      animation: catFloat 3.8s ease-in-out infinite;
+      filter: drop-shadow(0 0 10px rgba(158, 248, 232, 0.9));
+    }
+
+    @keyframes catFloat {
+      0%, 100% { transform: translateY(0) translateX(0); }
+      25% { transform: translateY(-4px) translateX(-4px); }
+      50% { transform: translateY(2px) translateX(3px); }
+      75% { transform: translateY(-2px) translateX(-1px); }
+    }
+
+    /* AI log panel */
+
+    .log-area {
+      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 11px;
+      color: var(--muted);
+      background: #070a15;
+      border-radius: 10px;
+      padding: 10px;
+      height: 120px;
+      overflow: auto;
+      border: 1px solid #20263b;
+    }
+
+    .log-line {
+      margin-bottom: 3px;
+      white-space: nowrap;
+    }
+
+    .log-line span.tag {
+      color: var(--accent);
+    }
+
+    .log-line span.warn {
+      color: var(--error);
+    }
+
+    /* choice panel */
+
+    .choice-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .choice-text {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .choice-row {
+      position: relative;
+      margin-top: 6px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      border-radius: 999px;
+      border: 1px solid var(--accent);
+      background: radial-gradient(circle at 20% 0, #334764, #172032);
+      color: var(--text);
+      font-size: 13px;
+      padding: 10px 20px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: transform 0.1s ease, box-shadow 0.2s ease, background 0.2s ease;
+    }
+
+    button span.icon {
+      font-size: 14px;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 0 16px rgba(142, 248, 232, 0.4);
+    }
+
+    button.yes-btn {
+      border-color: #4be4a5;
+      background: radial-gradient(circle at 20% 0, #355a4a, #13221a);
+    }
+
+    button.no-btn {
+      border-color: #ff6b81;
+      background: radial-gradient(circle at 20% 0, #4c2636, #24101a);
+      position: absolute;
+      right: 0;
+      top: 0;
+    }
+
+    .note {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    /* audio controls */
+
+    .audio-box {
+      margin-top: 10px;
+      border-radius: 10px;
+      border: 1px dashed rgba(142, 248, 232, 0.5);
+      padding: 8px 10px;
+      font-size: 11px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .audio-box button {
+      padding: 6px 14px;
+      font-size: 12px;
+    }
+
+    /* footer */
+
+    .footer {
+      margin-top: 10px;
+      font-size: 10px;
+      color: var(--muted);
+      text-align: right;
+    }
+
+    .footer span {
+      opacity: 0.8;
+    }
+
+    /* final / secret screen */
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at top, #181c3a, #050814 70%);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      text-align: center;
+      z-index: 999;
+    }
+
+    .overlay-inner {
+      max-width: 720px;
+    }
+
+    .overlay h2 {
+      font-size: clamp(22px, 5vw, 30px);
+      margin-bottom: 8px;
+      background: linear-gradient(90deg, var(--accent), #93b5ff, var(--accent2));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .overlay p {
+      font-size: 14px;
+      line-height: 1.7;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+
+    .overlay-gallery {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 14px;
+    }
+
+    .overlay-gallery img {
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.16);
+      max-width: 220px;
+      max-height: 220px;
+      object-fit: cover;
+    }
+
+    .overlay button {
+      margin-top: 8px;
+    }
+
+    /* stars specks */
+
+    .stars {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background-image:
+        radial-gradient(1px 1px at 20% 20%, rgba(255,255,255,0.35), transparent),
+        radial-gradient(1px 1px at 80% 30%, rgba(158,248,232,0.4), transparent),
+        radial-gradient(1px 1px at 10% 70%, rgba(255,207,107,0.4), transparent),
+        radial-gradient(1px 1px at 90% 80%, rgba(255,255,255,0.3), transparent);
+      opacity: 0.7;
+    }
+
+    @media (max-width: 720px) {
+      body {
+        padding: 12px;
+      }
+      .console {
+        padding: 16px 14px 18px;
+      }
+      .main-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+      .cat-orbit {
+        display: none;
+      }
+      .choice-row {
+        position: static;
+        flex-direction: column;
+      }
+      .no-btn {
+        position: relative;
+        right: auto;
+        top: auto;
+      }
+    }
+  </style>
 </head>
-
 <body>
+<div class="stars"></div>
 
-<!-- floating stars -->
-<div class="stars" style="--i:0"></div>
-<div class="stars" style="--i:1"></div>
-<div class="stars" style="--i:2"></div>
-<div class="stars" style="--i:3"></div>
-<div class="stars" style="--i:4"></div>
-<div class="stars" style="--i:5"></div>
+<div class="console">
+  <div class="scan-lines"></div>
 
-<div id="mainPage">
+  <div class="header-row">
+    <div class="logo-wrap">
+      <img src="poseidon-og.jpg" alt="PSDN.AI Logo" />
+    </div>
+    <div class="title-block">
+      <div class="badge">
+        <span class="badge-dot"></span>
+        <span>PSDN.AI // HOLIDAY EXPERIMENT</span>
+      </div>
+      <h1><span>Emotional Diagnostics Console</span></h1>
+      <p class="subtitle">
+        Sarick&nbsp;Shah affection model · powered by one very determined long-distance cat.
+      </p>
+    </div>
+    <div class="cat-orbit" aria-hidden="true">🐱</div>
+  </div>
 
-    <div class="logo">⚡ PSDN.AI CHRISTMAS CONSOLE ⚡</div>
+  <div class="main-grid">
+    <!-- LEFT PANEL: Sarick + hearts + logs -->
+    <div class="panel">
+      <div class="panel-title">Subject Profile</div>
+      <div class="status-row">
+        <span>SUBJECT: <strong>SARICK SHAH</strong></span>
+        <span class="status-pill">STATUS: <strong style="color:#a7ffdf;">CRITICALLY CUTE</strong></span>
+      </div>
+      <div class="profile-row">
+        <div class="avatar">
+          <img src="Sarick.jpg" alt="Sarick" />
+        </div>
+        <div class="profile-text">
+          <strong>PSDN.AI Core Human</strong>
+          Primary traits detected: space-brained, overqualified, under-rated in self-cuteness.<br/>
+          Sub-observation: thinks he is not cute. Dataset strongly disagrees.
+        </div>
+      </div>
 
-    <div class="cat">🐈‍⬛✨</div>
+      <div class="meter-wrap">
+        <div class="meter-label">PIXEL HEART METER · LDR INTENSITY</div>
+        <div class="pixel-meter" id="heart-meter">
+          <div class="pixel-cell on"></div>
+          <div class="pixel-cell on"></div>
+          <div class="pixel-cell on"></div>
+          <div class="pixel-cell on"></div>
+          <div class="pixel-cell on"></div>
+          <div class="pixel-cell on"></div>
+          <div class="pixel-cell on"></div>
+          <div class="pixel-cell on"></div>
+          <div class="pixel-cell on"></div>
+          <div class="pixel-cell on"></div>
+        </div>
+      </div>
 
-    <h2>Hi Sarick, this system has 1 question for you.</h2>
-
-    <div class="card">
-        <h3>Do you love YunHee?</h3>
-
-        <button id="yesBtn" onclick="showSecret()">YES 💙</button>
-
-        <button id="noBtn">NO 😼</button>
+      <div style="margin-top: 12px;">
+        <div class="panel-title" style="margin-bottom:4px;">Live Log</div>
+        <div class="log-area" id="log">
+          <div class="log-line"><span class="tag">[BOOT]</span> Initializing PSDN.AI Holiday Love Console…</div>
+          <div class="log-line"><span class="tag">[SCAN]</span> Acquiring Sarick facial data…  ███████████ 100%</div>
+          <div class="log-line"><span class="tag">[ANALYSIS]</span> Symmetry: illegal. Jawline: overpowered.</div>
+          <div class="log-line"><span class="tag">[MODEL]</span> &gt; claim: “I am not cute”</div>
+          <div class="log-line"><span class="warn">[ERROR]</span> Cute_Denial_Detected · This statement is rejected by the universe.</div>
+        </div>
+      </div>
     </div>
 
-    <div class="heart-bar">
-        <span class="pixel-heart">❤️</span>
-        <span class="pixel-heart">❤️</span>
-        <span class="pixel-heart">❤️</span>
-        <span class="pixel-heart">❤️</span>
-        <span class="pixel-heart">❤️</span>
-    </div>
+    <!-- RIGHT PANEL: question + buttons + audio -->
+    <div class="panel">
+      <div class="panel-title">Core Question</div>
 
-    <h3 style="margin-top:30px;">🎄 Christmas Special: Indian Cat Remix 🎄</h3>
-    <audio controls loop>
-        <source src="https://files.catbox.moe/3cjz72.mp3" type="audio/mpeg">
-    </audio>
+      <div class="choice-panel">
+        <div class="choice-text">
+          After extensive analysis of all known timelines, universes, and alternate realities,<br/>
+          this console has one critical yes/no check remaining:
+        </div>
+
+        <div class="choice-text" style="margin-top:6px; font-size:14px;">
+          <strong>Do you love this tiny chaos-cat who built you a whole website?</strong>
+        </div>
+
+        <div class="choice-row" id="choice-row">
+          <button class="yes-btn" id="yes-btn">
+            <span class="icon">💚</span>
+            <span>YES, obviously</span>
+          </button>
+
+          <button class="no-btn" id="no-btn">
+            <span class="icon">🚫</span>
+            <span>no</span>
+          </button>
+        </div>
+
+        <div class="note">
+          * Warning: NO option may experience unexpected quantum drift and refuse to be clicked.
+        </div>
+
+        <div class="audio-box">
+          <span>🎧 Voice log available: YunHee’s “Merry Christmas” transmission.</span>
+          <button type="button" id="play-voice">
+            <span class="icon">▶️</span>
+            <span>Play message</span>
+          </button>
+        </div>
+
+        <audio id="voice" src="merry.mp3"></audio>
+
+      </div>
+
+      <div class="footer">
+        <span>PSDN.AI · Holiday build · For Sarick, from your cat 💜</span>
+      </div>
+    </div>
+  </div>
 </div>
 
-<!-- SECRET PAGE -->
-<div id="secretPage">
-    <div class="secret-text">
-        <p>I have observed your face.<br>
-        It is statistically, undeniably, catastrophically adorable.<br><br>
+<!-- FINAL / SECRET SCREEN -->
+<div class="overlay" id="final-screen">
+  <div class="overlay-inner">
+    <h2>LOVE RESPONSE RECEIVED ✅</h2>
+    <p>
+      System update complete.<br/>
+      Cute-denial override successful. Affection confirmed. LDR connection stabilized.
+    </p>
 
-        Do not argue.<br>
-        I have run the models.<br>
-        I have peer-reviewed myself.<br><br>
+    <p>
+      I have observed your face.<br/>
+      It is statistically, undeniably, catastrophically adorable.<br/><br/>
+      Do not argue.<br/>
+      I have run the models.<br/>
+      I have peer-reviewed myself.<br/>
+      The data has spoken:<br/>
+      <strong>you are cute.</strong>
+    </p>
 
-        The data has spoken.<br>
-        You are cute.<br>
-        Submit to your fate. 😼💛</p>
-
-        <img src="baby-sarick.jpg" class="baby">
+    <div class="overlay-gallery">
+      <div>
+        <img src="baby-sarick.jpg" alt="Baby Sarick" />
+        <div style="font-size:11px;color:#9bb0d1;margin-top:4px;">Subject: Baby Sarick · Original source of all cuteness.</div>
+      </div>
+      <div>
+        <img src="September.jpg" alt="Us" />
+        <div style="font-size:11px;color:#9bb0d1;margin-top:4px;">Recorded memory sample from an extremely important day.</div>
+      </div>
     </div>
+
+    <p style="margin-bottom:10px;">
+      Thank you for existing in my timeline.<br/>
+      Merry Christmas, space brain. You are loved — loudly, stubbornly, and on repeat.
+    </p>
+
+    <button type="button" id="close-final">
+      <span class="icon">🌌</span>
+      <span>Return to console</span>
+    </button>
+  </div>
 </div>
 
 <script>
-// NO button runs away
-const noBtn = document.getElementById("noBtn");
-noBtn.addEventListener("mouseenter", () => {
-    noBtn.style.transform = `translate(${Math.random()*120-60}px, ${Math.random()*120-60}px)`;
-});
+  // LOG helper
+  const logArea = document.getElementById('log');
+  function addLog(msg, type = "info") {
+    if (!logArea) return;
+    const line = document.createElement('div');
+    line.className = 'log-line';
+    let tag = '[INFO]';
+    if (type === 'warn') tag = '[WARN]';
+    if (type === 'ok') tag = '[OK]';
+    line.innerHTML = '<span class="tag">' + tag + '</span> ' + msg;
+    logArea.appendChild(line);
+    logArea.scrollTop = logArea.scrollHeight;
+  }
 
-// Switch to secret page
-function showSecret(){
-    document.getElementById("mainPage").style.display = "none";
-    document.getElementById("secretPage").style.display = "block";
-}
+  // NO button runs away
+  const noBtn = document.getElementById('no-btn');
+  const choiceRow = document.getElementById('choice-row');
+
+  function moveNoButton() {
+    if (!noBtn || !choiceRow) return;
+
+    addLog('Subject attempted to select NO. Repositioning NO button…', 'warn');
+
+    const bounds = choiceRow.getBoundingClientRect();
+    const btnBounds = noBtn.getBoundingClientRect();
+
+    const maxX = Math.max(0, bounds.width - btnBounds.width);
+    const maxY = Math.max(0, bounds.height - btnBounds.height);
+
+    const randX = Math.random() * maxX * 0.8;
+    const randY = Math.random() * maxY * 0.6;
+
+    noBtn.style.position = 'absolute';
+    noBtn.style.left = randX + 'px';
+    noBtn.style.top = randY + 'px';
+  }
+
+  if (noBtn) {
+    noBtn.addEventListener('mouseenter', moveNoButton);
+    noBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      moveNoButton();
+      alert('Nice try. The universe rejects this answer.');
+    });
+    noBtn.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      moveNoButton();
+    }, { passive: false });
+  }
+
+  // YES button -> show final screen + play voice
+  const yesBtn = document.getElementById('yes-btn');
+  const finalScreen = document.getElementById('final-screen');
+  const closeFinal = document.getElementById('close-final');
+  const voice = document.getElementById('voice');
+
+  if (yesBtn) {
+    yesBtn.addEventListener('click', () => {
+      addLog('YES received. Unlocking final screen & playing voice log.', 'ok');
+      if (finalScreen) {
+        finalScreen.style.display = 'flex';
+      }
+      if (voice) {
+        voice.currentTime = 0;
+        voice.play().catch(() => {
+          // Mobile sometimes blocks autoplay; user can use play button instead.
+        });
+      }
+    });
+  }
+
+  if (closeFinal) {
+    closeFinal.addEventListener('click', () => {
+      if (finalScreen) finalScreen.style.display = 'none';
+    });
+  }
+
+  // PLAY VOICE button
+  const playBtn = document.getElementById('play-voice');
+  if (playBtn && voice) {
+    playBtn.addEventListener('click', () => {
+      voice.currentTime = 0;
+      voice.play().catch(() => {
+        alert('Tap again if audio was blocked. (Mobile sometimes needs a second touch.)');
+      });
+    });
+  }
+
+  // Just for fun: animate heart meter occasionally in logs
+  setTimeout(() => {
+    addLog('Heart_Meter reading: 100% · Long-distance affection stable.', 'ok');
+  }, 2200);
+  setTimeout(() => {
+    addLog('Forecast: 0% chance of you ever being “not cute”.', 'ok');
+  }, 4200);
 </script>
-
 </body>
 </html>
